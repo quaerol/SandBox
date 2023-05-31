@@ -1,0 +1,109 @@
+[gd_scene load_steps=22 format=3 uid="uid://dmao3pxmyo31m"]
+
+[ext_resource type="Shader" path="res://ss.gdshader" id="1_0cl40"]
+[ext_resource type="Script" path="res://Terrain.gd" id="2_7l2sk"]
+[ext_resource type="Texture2D" uid="uid://d75lvk2lbxt5" path="res://4volcono1.png" id="2_lqm3q"]
+[ext_resource type="Texture2D" uid="uid://ji3x38udsvci" path="res://graymapforblender - 副本.png" id="3_nhwts"]
+[ext_resource type="Shader" path="res://Main.gdshader" id="4_1cpnk"]
+[ext_resource type="Texture2D" uid="uid://c7rmpyrvvg280" path="res://1opensource1.png" id="4_6xgum"]
+[ext_resource type="Texture2D" uid="uid://n1l1krdi8njw" path="res://Snow004_1K_Color_cc0.png" id="6_nnjxx"]
+[ext_resource type="Texture2D" uid="uid://diwtsj00tpcl0" path="res://Snow004_1K_NormalGL_cc0.png" id="7_e7wr6"]
+[ext_resource type="Texture2D" uid="uid://28jajup5pfkr" path="res://Snow004_1K_Roughness_cc0.png" id="8_hppmj"]
+[ext_resource type="PackedScene" uid="uid://dbupuoqk1x3l3" path="res://Scenes/Fish/fish.tscn" id="10_ld1ki"]
+[ext_resource type="Script" path="res://InitFish.gd" id="11_kdvyp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_alafo"]
+render_priority = 0
+shader = ExtResource("1_0cl40")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("3_nhwts")
+shader_parameter/ColorMapSampler = ExtResource("2_lqm3q")
+
+[sub_resource type="PlaneMesh" id="6"]
+material = SubResource("ShaderMaterial_alafo")
+size = Vector2(8, 4.5)
+
+[sub_resource type="ImageTexture" id="ImageTexture_cvqql"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_qk2x8"]
+noise_type = 3
+seed = 2
+frequency = 0.011
+fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2eahp"]
+in_3d_space = true
+seamless = true
+as_normal_map = true
+bump_strength = 1.5
+noise = SubResource("FastNoiseLite_qk2x8")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_htn5n"]
+noise_type = 3
+seed = 2
+frequency = 0.011
+fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ji2w6"]
+seamless = true
+as_normal_map = true
+bump_strength = 1.5
+noise = SubResource("FastNoiseLite_htn5n")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_83i72"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_gn3h5"]
+seamless = true
+noise = SubResource("FastNoiseLite_83i72")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_334ik"]
+render_priority = 0
+shader = ExtResource("4_1cpnk")
+shader_parameter/albedo = Color(0, 0.321569, 0.431373, 1)
+shader_parameter/albedo2 = Color(0, 0.47451, 0.764706, 1)
+shader_parameter/metallic = 0.0
+shader_parameter/roughness = 0.02
+shader_parameter/wave_direction = Vector2(0, 1)
+shader_parameter/wave_direction2 = Vector2(0, 1)
+shader_parameter/time_scale = 0.025
+shader_parameter/noise_scale = 10.0
+shader_parameter/height_scale = 0.15
+shader_parameter/color_deep = Color(0.105882, 0.294118, 0.329412, 1)
+shader_parameter/color_shallow = Color(0, 0.552941, 0.65098, 1)
+shader_parameter/beers_law = 2.0
+shader_parameter/depth_offset = -0.75
+shader_parameter/edge_scale = 0.1
+shader_parameter/near = 1.0
+shader_parameter/far = 100.0
+shader_parameter/edge_color = Color(1, 1, 1, 1)
+shader_parameter/snow_height = 0.3
+shader_parameter/texture_albedo = SubResource("ImageTexture_cvqql")
+shader_parameter/ColorMapSampler = ExtResource("4_6xgum")
+shader_parameter/wave = SubResource("NoiseTexture2D_gn3h5")
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_2eahp")
+shader_parameter/texture_normal2 = SubResource("NoiseTexture2D_ji2w6")
+shader_parameter/color_sample = ExtResource("6_nnjxx")
+shader_parameter/normal_sample = ExtResource("7_e7wr6")
+shader_parameter/roughness_sample = ExtResource("8_hppmj")
+
+[node name="Main" type="Node3D"]
+
+[node name="Terrain" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2.25)
+mesh = SubResource("6")
+surface_material_override/0 = SubResource("ShaderMaterial_334ik")
+script = ExtResource("2_7l2sk")
+
+[node name="Avatar" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="Avatar"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 4, 2.9, 2.25)
+fov = 84.6
+
+[node name="Realsense" type="Realsense" parent="."]
+
+[node name="one_fish" parent="." instance=ExtResource("10_ld1ki")]
+transform = Transform3D(30, 0, 0, 0, 30, 0, 0, 0, 30, 4.02672, 0.354374, 3.34347)
+
+[node name="InitFish" type="Node" parent="."]
+script = ExtResource("11_kdvyp")

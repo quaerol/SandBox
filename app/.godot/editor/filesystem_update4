@@ -1,0 +1,5 @@
+res://Main.tscn
+res://ss.gdshader
+res://Scripts/fish/fish.gd
+res://Scenes/Fish/fish.tscn
+res://Terrain.gd

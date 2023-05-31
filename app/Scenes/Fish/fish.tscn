@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3 uid="uid://dbupuoqk1x3l3"]
+
+[ext_resource type="PackedScene" uid="uid://pr1kke5udn12" path="res://Scenes/Farm/鱼.fbx" id="1_4mnyq"]
+[ext_resource type="Texture2D" uid="uid://cnj4jdem58yi1" path="res://Resources/Fish/Fish_Color.jpg" id="2_cqa8g"]
+[ext_resource type="Script" path="res://Scripts/fish/FishAnimationPlayer.gd" id="2_hs6r4"]
+[ext_resource type="Script" path="res://Scripts/fish/fish.gd" id="2_ykyft"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l8gw7"]
+albedo_texture = ExtResource("2_cqa8g")
+
+[node name="鱼" instance=ExtResource("1_4mnyq")]
+script = ExtResource("2_ykyft")
+
+[node name="Skeleton3D" parent="RootNode/Armature" index="0"]
+bones/0/rotation = Quaternion(0.679284, 0.196402, 0.679284, 0.196401)
+bones/1/rotation = Quaternion(0.667729, 0.23479, 0.671283, -0.219978)
+bones/2/rotation = Quaternion(-0.169317, 0.00041404, -0.00528014, 0.985547)
+bones/4/rotation = Quaternion(0.21591, -0.00161338, -0.00504476, 0.976399)
+bones/6/rotation = Quaternion(0.75466, 0.0833348, 0.63692, 0.133705)
+bones/8/rotation = Quaternion(0.795169, -0.0742453, 0.589858, -0.11942)
+bones/10/rotation = Quaternion(-0.262792, 0.657594, 0.249919, 0.660342)
+bones/11/rotation = Quaternion(0.252594, 0.00222847, 0.0146215, 0.967459)
+bones/12/rotation = Quaternion(-0.125821, -0.00149698, -0.00259226, 0.992049)
+bones/14/rotation = Quaternion(-0.0916395, -0.00270679, -0.0025141, 0.995785)
+bones/16/rotation = Quaternion(0.00297893, -0.168405, 0.894872, -0.413322)
+bones/18/rotation = Quaternion(-0.005395, -0.179459, 0.912633, 0.367242)
+
+[node name="Mesh4" parent="RootNode/Armature/Skeleton3D" index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_l8gw7")
+
+[node name="AnimationPlayer" parent="." index="1"]
+script = ExtResource("2_hs6r4")
