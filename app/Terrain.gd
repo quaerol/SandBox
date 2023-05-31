@@ -48,7 +48,6 @@ func get_frame():
 		depth_array = realsense.get_depth_frame(top_offset, right_offset, bottom_offset, left_offset,segment_size)
 		width = realsense.get_frame_width()
 		height = realsense.get_frame_height()
-		print(width,height)
 	return {"width": width, "height": height, "depth_array": depth_array}
 
 # 初始化：获取传感器帧图像，创建网格模型Called when the node enters the scene tree for the first time.

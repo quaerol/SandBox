@@ -139,7 +139,7 @@ func coordinates_space2pixel(space_coord: Vector3)->Vector2:
 	var img_size = img.get_size()
 	# 图片像素坐标和物体坐标之间的映射,
 	var pixel_coord_x =  space_coord.x * (img_size.x / terrain_size.x)
-	var pixel_coord_y =  space_coord.y * (img_size.y / terrain_size.y)
+	var pixel_coord_y =  space_coord.z * (img_size.y / terrain_size.y)
 	
 	# int()：将浮点数舍入到最接近的整数。
 	return Vector2(int(pixel_coord_x),int(pixel_coord_y))
