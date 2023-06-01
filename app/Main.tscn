@@ -103,7 +103,7 @@ fov = 84.6
 [node name="Realsense" type="Realsense" parent="."]
 
 [node name="one_fish" parent="." instance=ExtResource("10_ld1ki")]
-transform = Transform3D(30, 0, 0, 0, 30, 0, 0, 0, 30, 4.02672, 0.354374, 3.53326)
+transform = Transform3D(30, 0, 0, 0, 30, 0, 0, 0, 30, 2.04608, 0.354374, 3.53326)
 
 [node name="InitFish" type="Node" parent="."]
 script = ExtResource("11_kdvyp")

@@ -5,6 +5,7 @@ const DEBUG = false
 var img = Image.new()
 var img_colormap = Image.new()
 
+
 # Use SimplexNoise if debug enabled, else use GDRealsense
 # 如果是DEBUG，采用“开放简单噪声”来生成数据源
 #var realsense = FastNoiseLite.new() if (DEBUG) else load("res://bin/x11/gdrealsense.gdns").new()
@@ -29,9 +30,7 @@ var segment_size = 1
 
 #var sea_level = 0.02
 var material
-var rng = RandomNumberGenerator.new()
 
-var fish = preload("res://Scenes/Fish/fish.tscn")
 #读取传感器帧数据
 func get_frame():
 	var width : float
@@ -86,39 +85,14 @@ func _ready():
 #				st.add_index((vert_x_width * vert_y) + vert_x)
 #				st.add_index((vert_x_width * next_vert_y) + next_vert_x)
 #				st.add_index((vert_x_width * next_vert_y) + vert_x)
-	
-#	var water = find_pos_in_water(img)
-#
-#	var fish_instance = fish.instantiate()
-#
-#	# 获取根节点
-#	var root_node = get_tree().get_root()
-#
-#	var fish_init = water[water.size /2]
-#	var space_fish_init = coordinates_pixel2space(fish_init,img.get_size(),self.mesh.size)
-#	# 设置场景实例的位置	
-#	fish_instance.position = space_fish_init
 
-	# 将实例添加到根节点下
-#	root_node.add_child(fish_instance)
-	
-	
-	
 	$"../one_fish".img = img
 	$"../one_fish".terrain_size = self.mesh.size
 
 #	$"../one_fish".terrain_size = Vector2(frame.width, frame.height)
 
 
-
-
-
-
 func _process(delta):
-#	var frame = get_frame()
-#	img.create_from_data(frame.width, frame.height, false, Image.FORMAT_R8, frame.depth_array)
-#	false # img.lock() # TODOConverter40, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed
-	
 	#获取当前帧
 	var frame = get_frame()	
 	#print(frame.depth_array)
@@ -143,11 +117,6 @@ func _process(delta):
 	$"../one_fish".img = img
 	$"../one_fish".terrain_size = self.mesh.size
 
-#	img.load("res://image - 副本.png")
-
-
-
-
 #	update_shader(texture,texture_1)
 #	#get_surface_override_material(0).set_shader_parameter("texture_albedo", texture)
 #
@@ -158,19 +127,4 @@ func _process(delta):
 #	get_surface_override_material(0).set_shader_parameter("texture_albedo", texture)
 #	get_surface_override_material(0).set_shader_parameter("ColorMapSampler", texture_1)
 #	#get_surface_material(0)
-
-func find_pos_in_water(img:Image):
-	var water_area:Array
-	for y in range(0,img.get_height()):
-		for x in range(0,img.get_width()):
-			var pixel = img.get_pixel(x ,y)
-			var vector = Vector2(x, y)
-			if pixel.r < 100:
-					water_area.append(vector)
-	return water_area
-
-func coordinates_pixel2space(pixel_coord: Vector2,img_size:Vector2,terrain_size:Vector2)->Vector3:
-	var pixel_space_x =   pixel_coord.x  *(terrain_size.x / img_size.x )
-	var pixel_space_y =   pixel_coord.y  *(terrain_size.y / img_size.y )
-	return Vector3(pixel_space_x,0,pixel_space_y)
 

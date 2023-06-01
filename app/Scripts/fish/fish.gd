@@ -62,7 +62,7 @@ var pixel
 var filtered_vectors = []
 
 var target_position   # 目标位置
-var move_duration = 1  # 移动持续时间
+var move_duration = 0.5  # 移动持续时间
 var current_time = 0.0  # 当前时间
 var start_position: Vector3  # 起始位置
 
@@ -98,25 +98,32 @@ func _on_move_complete():
 	current_time = 0.0  # 当前时间
 	start_position = self.position # 更新起始位置
 	
-	print("start_position",start_position)
+#	print("start_position",start_position)
 	
 	var thing_pixel_coord = coordinates_space2pixel(start_position)
 
-	var radius = 10
+	var radius = 7
 	
 	get_area(thing_pixel_coord,radius,filtered_vectors)
-
-#	var index = randi() % filtered_vectors.size()
-	if get_index:
-		index = randi() % filtered_vectors.size()
-		get_index = false
-
-	if filtered_vectors.size() < pow(radius*2+1,2) /2:
-		index = randi() % filtered_vectors.size()
-		get_index = true
-		
-	var pixel_position = filtered_vectors[index]
+	print("filtered_vectors size----------",filtered_vectors.size())
+	var index = randi() % filtered_vectors.size()
 	
+	var pixel_position 
+	
+#	if get_index:
+##		return random.random() * (max_value - min_value) + min_value
+##		index = randi() % filtered_vectors.size() # 5 121
+#		index = randi_range(10, filtered_vectors.size()-10) 
+#		print("index ",index)
+#		pixel_position = filtered_vectors[index]
+#		get_index = false
+#
+#	if filtered_vectors.size() <= pow(radius*2+1,2)/2: # 121
+#		print("out--------",filtered_vectors.size())
+##		index = randi_range(10, filtered_vectors.size()-10) 
+#		get_index = true
+	print("index ",index)	
+	pixel_position = filtered_vectors[index]
 	filtered_vectors.clear()
 	
 	# 将选择的中间像素坐标映射到空间坐标 ,
@@ -131,7 +138,7 @@ func _on_move_complete():
 #	target_position.x += randi() % 2 + randf()
 #	target_position.z += randi() % 2 + randf()
 	
-	print("target_position",target_position)
+#	print("target_position",target_position)
 	
 # 将移动物体的空间坐标
 func coordinates_space2pixel(space_coord: Vector3)->Vector2:
@@ -165,10 +172,10 @@ func get_area(pos:Vector2,radius:int,filtered_vectors:Array):
 			if x >= 0 and x < img.get_width() and y >= 0 and y < img.get_height():
 				pixel = img.get_pixel(x ,y)
 				var vector = Vector2(x, y)
-				if pixel.r < 50:
+#				var d = sqrt((int(pos.x) - int(x))^2 + (int(pos.y) - int(y))^2)
+#				if pixel.r < 0.7 && d <= radius:
+				if pixel.r < 1 :
 					filtered_vectors.append(vector)
-
-	
 	
 	
 	

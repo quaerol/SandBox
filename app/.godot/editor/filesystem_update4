@@ -1,5 +1,8 @@
 res://Main.tscn
 res://ss.gdshader
-res://Scripts/fish/fish.gd
-res://Scenes/Fish/fish.tscn
+res://InitFish.gd
 res://Terrain.gd
+res://Scenes/Fish/fish.tscn
+res://test/test_find_water.tscn
+res://Scripts/fish/fish.gd
+res://test/test_find_water.gd
