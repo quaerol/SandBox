@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8j44bw8nmjj6"]
+
+[ext_resource type="Script" path="res://test/test_find_water.gd" id="1_5puti"]
+
+[node name="test_find_water" type="Node3D"]
+script = ExtResource("1_5puti")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+centered = false
