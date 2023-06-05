@@ -37,6 +37,30 @@ void fragment() {
     //COLOR = tempVec4;
      //ALBEDO = colorDic;
 	 //ALBEDO = vec3(depth,depth, depth);
+	
+	
+	float step = depth / 0.15;   
+	float f  = fract(step);
+
+	float aa = smoothstep(0.0051, 0.03, f); 
+	//如果偏移小，aa为0，画等高线；如果偏移大，aa为1，不画等高线。
+
+	if (aa < 1.0)
+		{
+	tempVec4=vec4(0.1+aa/5.0, 0.1+aa/5.0 ,0.1+aa/5.0 ,1.0); 
+	}         		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	ALBEDO =  vec3(tempVec4.x,tempVec4.y, tempVec4.z);
 	
 	

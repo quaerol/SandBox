@@ -77,20 +77,20 @@ var get_index = true
 
 func _ready():
 	self.position = Vector3(4,0.5,3)
-	_on_move_complete()	
+#	_on_move_complete()	
 
 func _process(delta):
 
 #	# 移动的逻辑 ，利用线性插值进行移送，或者利用动画进行移动
-	current_time += delta
-	if current_time > move_duration:
-		current_time = move_duration
-
-	var t = current_time / move_duration  # 计算插值系数
-
-	self.position = start_position.lerp(target_position, t)  # 进行线性插值
-	if current_time >= move_duration:
-		_on_move_complete()
+#	current_time += delta
+#	if current_time > move_duration:
+#		current_time = move_duration
+#
+#	var t = current_time / move_duration  # 计算插值系数
+#
+#	self.position = start_position.lerp(target_position, t)  # 进行线性插值
+#	if current_time >= move_duration:
+#		_on_move_complete()
 	pass
 
 func _on_move_complete():
