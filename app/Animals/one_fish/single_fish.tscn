@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://buut758lfwuk4"]
 
-[ext_resource type="Script" path="res://Animals/one_fish/fish.gd" id="1_kbvh8"]
+[ext_resource type="Script" path="res://test/fish.gd" id="1_rtval"]
 [ext_resource type="ArrayMesh" uid="uid://c6sylt7ph5lge" path="res://Animals/one_fish/fish_mesh.obj" id="2_gp71v"]
 [ext_resource type="Texture2D" uid="uid://xa62c7ux4qfu" path="res://Animals/one_fish/fish_mesh.jpg" id="3_2k70e"]
 [ext_resource type="Script" path="res://Animals/one_fish/fish_mesh.gd" id="4_qfmm6"]
@@ -148,7 +148,7 @@ void fragment() {
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_y6mxr"]
 render_priority = 0
 shader = SubResource("Shader_etl1v")
-shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/albedo = Color(1, 0.14902, 0.317647, 1)
 shader_parameter/point_size = 1.0
 shader_parameter/roughness = 1.0
 shader_parameter/metallic_texture_channel = Plane(1, 0, 0, 0)
@@ -168,15 +168,15 @@ shader_parameter/body_length = 2.0
 shader_parameter/mask_black = -1.0
 shader_parameter/mask_white = 1.0
 shader_parameter/frequency = 2.0
-shader_parameter/fish_timer = 756.631
+shader_parameter/fish_timer = 996.611
 shader_parameter/texture_albedo = ExtResource("3_2k70e")
 
 [node name="one_fish" type="Node3D"]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
-script = ExtResource("1_kbvh8")
+script = ExtResource("1_rtval")
+velocity = Vector3(0, 0, 0)
 
 [node name="fish_mesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.3, 0, -4.52987e-08, 0, 0.3, 0, 4.52987e-08, 0, -0.3, 0, 0, 0)
+transform = Transform3D(-0.2, 0, -3.01992e-08, 0, 0.2, 0, 3.01992e-08, 0, -0.2, 0, 0, 0)
 mesh = ExtResource("2_gp71v")
 surface_material_override/0 = SubResource("ShaderMaterial_y6mxr")
 script = ExtResource("4_qfmm6")

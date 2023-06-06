@@ -3,7 +3,7 @@ extends Node3D
 #@onready var boid_scene = preload("res://Scenes/Farm/boid_fish.tscn")
 @onready var boid_carp= preload("res://Animals/one_fish/single_fish.tscn")
 
-@export var numBoids : int = 3 # Number of boids spawned at the start (int, 0, 1000) (it should be adjustable dynamically).
+@export var numBoids := 3 # Number of boids spawned at the start (int, 0, 1000) (it should be adjustable dynamically).
 
 
 #分离(避开）行为参数
@@ -64,6 +64,7 @@ var z_upper = 4.5
 #鱼活动的边界 x起点的X坐标，y起点的Y坐标，z值保存X轴方向上的宽度，w值保存Y轴方向上的宽度
 var borders : Vector4 = Vector4(0, 0 , 8, 4.5)
 var border_coef = 0.95
+
 var internalBorders : Vector4 = border_coef * borders
 
 
@@ -77,39 +78,50 @@ var maxVelocityChange : = 0.1
 
 @export var img_size : = Vector2(1280,720)
 @export var terrain_size := Vector2(8,4.5)
-@export var img : Image = Image.new()
-@export var water_depth  := 0.5
-func _ready():
 
+@export var img : Image = Image.new()
+
+@export var water_depth  := 0.7
+
+func _ready():
 	#add_child(mouse_sphere_kinematicbody)
 	for i in range(numBoids):
 		var new_boid = boid_carp.instantiate()
 		add_child(new_boid) # This needs to be done first because boids call get_parent on initBoid()
-		new_boid.initBoid(x_lower+0.2,x_upper-0.2,y_lower,y_upper,z_lower+0.2,z_upper-0.2)	
-
-		print(new_boid.position)
-		print(new_boid.velocity)
+		var temp = new_boid.init_pos(x_lower+0.2,x_upper-0.2,y_lower,y_upper,z_lower+0.2,z_upper-0.2)
+# 不在水中，继续找，
+		while true:
+			temp = new_boid.init_pos(x_lower+0.2,x_upper-0.2,y_lower,y_upper,z_lower+0.2,z_upper-0.2)
+			if !is_pos_in_water(temp):
+				print("-------------temp--------------------",temp)
+				break
+		
+		new_boid.initBoid(temp)
+		print("new_boid.position-----------",new_boid.position)
+		print("new_boid.velocity------------------",new_boid.velocity)
 
 func _process(delta):
 	var playDelta = playSpeed * delta * 100
 	
 	for boid in get_children():
 		boid.ownTime += playDelta * 0.0002
+		print("boid.Velocity-----------",boid.velocity)
 # randf_range可能取到0或1
 		if randf_range(0,1) < 1 :   
 # 一个规则，碰到边界改变方向
 			ApplyRules(boid,delta)     
-		print(boid.globalVelocityChange)
+		print("boid.globalVelocityChange-----------",boid.globalVelocityChange)
+		
 # 改变速度
 		update(boid,delta)     
-
-
+		
 # 叉积，不共线，看向那个方向
 		if boid.velocity.cross(Vector3.UP) != null:
-#			var new_transform= boid.transform.basis.looking_at(boid.velocity, Vector3.UP)
-#			boid.transform = boid.transform.interpolate_with(new_transform, 10 * delta)
+			if boid.velocity == Vector3.ZERO:
+				print("boid.globalVelocityChange-----------",boid.globalVelocityChange)
+#				get_tree().paused = true
+			print("boid.Velocity-----------",boid.velocity)
 			boid.transform.basis = transform.basis.looking_at(boid.velocity,Vector3.UP)
-#		boid.transform.origin = boidPosition + boid.velocity 
 	pass
 
 func ApplyRules(boid , delta):
@@ -246,35 +258,35 @@ func ApplyRules(boid , delta):
 	boid.bordersF = bordersEffect(boid, delta)
 	if boid.border :
 		boid.applyVelocityChange(boid.bordersF)
+		print("---------------------边界-----------------",boid.bordersF)
 		
-	boid.bordersF = water_effect(boid, delta)
-	if boid.border :
-		boid.applyVelocityChange(boid.bordersF)
-	
-#	检测像素的值
-	
+	var futureLocation =  boid.position + boid.velocity*10;
+	# 如果下一个坐标除了边界，或者不在水中
+#	if !(is_pos_in_water(futureLocation)):
+#		boid.bordersF = bordersEffect(boid, delta)
+#		boid.applyVelocityChange(boid.bordersF)
+#		pass
+		
+#	var temp = waterEffect(boid, delta)
+#	if boid.border :
+#		boid.applyVelocityChange(temp)
+	water_effect(boid, delta)
 
-#
-#
-#
-#func applyVelocityChange(velocityChange):
-#	globalVelocityChange += velocityChange
-
-
+# update根据globalVelocityChange更新，velocity，移动，
 func update(boid, delta):
 	
 	boid.velocity += boid.globalVelocityChange
-	
+
+	# length 计算速度
 	if  boid.velocity.length() > topSpeed : 
-		boid.velocity = topSpeed * boid.velocity.normalized()
 		print("too fast")
-	print("boid.velocity",boid.velocity)
+		boid.velocity = topSpeed * boid.velocity.normalized()
+		
+	print("boid.velocity==========================",boid.velocity)
 
 	#boid.transform.origin += boid.velocity
-	boid.position += boid.velocity *delta*2
-	print("boid.position")
-	print(boid.position)
-	
+	boid.position += boid.velocity * delta
+
 	boid.globalVelocityChange *= 0
 		
 #	if boid.velocity.cross(Vector3.UP) != null:
@@ -330,6 +342,7 @@ func bordersEffect(boid , delta):
 			target.z = borders.y
 	else :
 		boid.border = false
+		
 	desired = target - location
 	desired.normalized()
 	desired *= topSpeed
@@ -337,60 +350,70 @@ func bordersEffect(boid , delta):
 	velocityChange = desired - velocity;
 	if 	velocityChange.length() > maxVelocityChange: 
 		velocityChange = maxVelocityChange * velocityChange.normalized()
-	
+		
 	return velocityChange
+
 
 func water_effect(boid , delta):
-	var desired : Vector3
-	var futureLocation : Vector3
-	var location : Vector3
-	var velocity : Vector3    
-	var velocityChange : Vector3 
-	
-	location = boid.position
-	velocity = boid.velocity
-	
-	#Predict location 10 (arbitrary choice) frames ahead
-	futureLocation = location + velocity*10;
-	
-	#目标位置
-	var target = location
-	
-	#下一个移动点是否在水中
-	# 不在，更新移动方向
-	if (!is_pos_in_water(futureLocation)): #Go to the opposite direction
-		boid.border = true
-		if (futureLocation.x < internalBorders.x):
-			target.x = borders.x + borders.z
-		if (futureLocation.z < internalBorders.y):
-			target.z = borders.y + borders.w
-		if (futureLocation.x > internalBorders.x + internalBorders.z):
-			target.x = borders.x
-		if (futureLocation.z > internalBorders.y + internalBorders.w):
-			target.z = borders.y
-	else :
-		boid.border = false
 
+	var velocity = boid.velocity
+	#Predict location 10 (arbitrary choice) frames ahead
+	var futureLocation =  boid.position +  boid.velocity * 2;
 	
-	desired = target - location
-	desired.normalized()
-	desired *= topSpeed
+	print("futureLocation--------------------",futureLocation,"------boid.position-------",boid.position)
 	
+	# 下一个移动点不在水中，或者超出边界
+	if !is_pos_in_water(futureLocation) or !is_pos_in_border(futureLocation): #Go to the opposite direction
+		# 随机的方向，
+		var random_direction = random_direction()
+		print("-----------下一个移动点不在水中，或者超出边界-------------velocity---------------------------",velocity)
+		boid.applyVelocityChange(-velocity.normalized())
+
+		
+		
+# 生成一个随机的单位向量
+func random_direction():
+# PI 180度
+	var angle = randf_range(0, PI)  # 生成一个随机角度
+	var x = cos(angle)  # 计算 x 分量
+	var y = sin(angle)  # 计算 y 分量
+	return Vector3(x, 0.0, y)
 	
-	velocityChange = desired - velocity;
-	if 	velocityChange.length() > maxVelocityChange: velocityChange = maxVelocityChange * velocityChange.normalized()
-	return velocityChange
+func random_velocity(delta):
+	var random_direction = random_direction()
+	#设置速度大小
+	var speed = 100
+# 生成随机方向向量并乘以速度大小
+	var random_velocity = random_direction() * speed
+# 使用随机速度进行移动
+	position += random_velocity * delta
 
 # 这个点是否在水中
-func is_pos_in_water(pos):
+func is_pos_in_water(pos: Vector3):
 #	var location : Vector3 = boid.position
-	var pos_pixel = coordinates_space2pixel(pos,img,terrain_size)
-	var pixel = img.get_pixel(pos_pixel.x ,pos_pixel.y)
-	if pixel.r > water_depth:
-		print("不在水的区域")
+	var pos_pixel = coordinates_space2pixel(pos,img,terrain_size) # 1280*720 / 8 *4.5
+	if pos_pixel.x >= 1280 or pos_pixel.x <=0 or pos_pixel.y >= 720 or pos_pixel.y <=0:
+		print("越界-------------------------------")
 		return false
-	return true
-
+	else:
+		var pixel = img.get_pixel(pos_pixel.x ,pos_pixel.y)
+		print("pixel---------------",pixel)
+		# 0 是纯黑 1 白色
+		if pixel.r > 0.3 and pixel.r < 0.4:
+			print("不在水的区域----------------")
+			return false
+		else:
+			return true
+		
+func is_pos_in_border(futureLocation: Vector3):
+	if (futureLocation.x < 0):
+		return false
+	if (futureLocation.z < 0):
+		return false
+	if (futureLocation.x > 8):
+		return false
+	if (futureLocation.z > 4.5):
+		return false
 func coordinates_space2pixel(space_coord: Vector3,img,terrain_size)->Vector2:
 	# 图片的大小
 	var img_size = img.get_size()

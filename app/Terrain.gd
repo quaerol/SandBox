@@ -18,6 +18,7 @@ var segment_size = 1
 
 #var sea_level = 0.02
 var material
+
 @onready var node_3d = $"../Node3D"
 
 #读取传感器帧数据
@@ -39,18 +40,18 @@ func _ready():
 
 #	#创建帧图像img
 	img = img.create_from_data(frame.width, frame.height, false, Image.FORMAT_R8, frame.depth_array)
-	img.load("res://graymapforblender.png")	
-	node_3d.img = img
+#	img.load("res://image.png")	
+	$"../Node3D".img = img
 
 func _process(delta):
 
 	var frame = get_frame()	
 
 	img = img.create_from_data(frame.width, frame.height, false, Image.FORMAT_R8, frame.depth_array)
-	img.load("res://graymapforblender.png")	
+#	img.load("res://image.png")	
 	node_3d.img = img
 	var texture = ImageTexture.create_from_image(img)
-#	img.save_png("image.png")
+	img.save_png("image.png")
 
 	img_colormap.load("res://graymapforblender.png")	
 	var texture_2 = ImageTexture.new()
