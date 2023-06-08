@@ -1,6 +1,7 @@
-res://Main.tscn
+res://test/test_find_water.tscn
 res://Scripts/fish/fish.gd
 res://ss.gdshader
-res://test/Fishes_Boids_test.gd
+res://Scenes/Fishes_Boids.gd
+res://Main.tscn
 res://Animals/one_fish/single_fish.tscn
-res://test/fish.gd
+res://Terrain.gd

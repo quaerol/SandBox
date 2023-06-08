@@ -81,18 +81,20 @@ var maxVelocityChange : = 0.1
 
 @export var img : Image = Image.new()
 
+@export var img_gradlient : Image = Image.new()
+
 @export var water_depth  := 0.7
 
 func _ready():
 	#add_child(mouse_sphere_kinematicbody)
-	for i in range(numBoids):
+	for i in range(1):
 		var new_boid = boid_carp.instantiate()
 		add_child(new_boid) # This needs to be done first because boids call get_parent on initBoid()
 		var temp = new_boid.init_pos(x_lower+0.2,x_upper-0.2,y_lower,y_upper,z_lower+0.2,z_upper-0.2)
 # 不在水中，继续找，
 		while true:
 			temp = new_boid.init_pos(x_lower+0.2,x_upper-0.2,y_lower,y_upper,z_lower+0.2,z_upper-0.2)
-			if !is_pos_in_water(temp):
+			if !is_pos_in_water(temp,new_boid):
 				print("-------------temp--------------------",temp)
 				break
 		
@@ -102,25 +104,18 @@ func _ready():
 
 func _process(delta):
 	var playDelta = playSpeed * delta * 100
-	
 	for boid in get_children():
 		boid.ownTime += playDelta * 0.0002
-		print("boid.Velocity-----------",boid.velocity)
+#		print("boid.Velocity-----------",boid.velocity)
 # randf_range可能取到0或1
 		if randf_range(0,1) < 1 :   
 # 一个规则，碰到边界改变方向
 			ApplyRules(boid,delta)     
-		print("boid.globalVelocityChange-----------",boid.globalVelocityChange)
-		
+#		print("boid.globalVelocityChange-----------",boid.globalVelocityChange)
 # 改变速度
 		update(boid,delta)     
-		
 # 叉积，不共线，看向那个方向
 		if boid.velocity.cross(Vector3.UP) != null:
-			if boid.velocity == Vector3.ZERO:
-				print("boid.globalVelocityChange-----------",boid.globalVelocityChange)
-#				get_tree().paused = true
-			print("boid.Velocity-----------",boid.velocity)
 			boid.transform.basis = transform.basis.looking_at(boid.velocity,Vector3.UP)
 	pass
 
@@ -252,41 +247,28 @@ func ApplyRules(boid , delta):
 ##		var up_vector = base.basis * Vector3.UP
 ##		var base = boids_multi_mesh.multimesh.get_instance_transform(i)
 ##			base.basis = base.basis.looking_at(
-
-
 	# 碰到下一位置是边界和不在水中，都改变方向
 	boid.bordersF = bordersEffect(boid, delta)
 	if boid.border :
 		boid.applyVelocityChange(boid.bordersF)
-		print("---------------------边界-----------------",boid.bordersF)
-		
-	var futureLocation =  boid.position + boid.velocity*10;
-	# 如果下一个坐标除了边界，或者不在水中
-#	if !(is_pos_in_water(futureLocation)):
-#		boid.bordersF = bordersEffect(boid, delta)
-#		boid.applyVelocityChange(boid.bordersF)
-#		pass
-		
-#	var temp = waterEffect(boid, delta)
-#	if boid.border :
-#		boid.applyVelocityChange(temp)
-	water_effect(boid, delta)
+		print("-----------------borders---boid.bordersF--------",boid.bordersF,"--boid.velocity---",boid.velocity)
+##
+	var waterF =  water_effect(boid, delta)
+	if boid.water :
+		boid.applyVelocityChange(waterF)
+		print("---------------------no---water---waterF--------",waterF,"--boid.velocity---",boid.velocity)
 
-# update根据globalVelocityChange更新，velocity，移动，
 func update(boid, delta):
-	
 	boid.velocity += boid.globalVelocityChange
-
+	print("----------boid.globalVelocityChange-----------------",boid.globalVelocityChange)
+	print("----------boid.velocity-----------------",boid.velocity)
 	# length 计算速度
 	if  boid.velocity.length() > topSpeed : 
 		print("too fast")
 		boid.velocity = topSpeed * boid.velocity.normalized()
-		
-	print("boid.velocity==========================",boid.velocity)
-
+#	print("boid.velocity==========================",boid.velocity)
 	#boid.transform.origin += boid.velocity
-	boid.position += boid.velocity * delta
-
+	boid.position += boid.velocity * delta *3
 	boid.globalVelocityChange *= 0
 		
 #	if boid.velocity.cross(Vector3.UP) != null:
@@ -353,67 +335,60 @@ func bordersEffect(boid , delta):
 		
 	return velocityChange
 
-
 func water_effect(boid , delta):
-
+	var desired : Vector3
 	var velocity = boid.velocity
-	#Predict location 10 (arbitrary choice) frames ahead
-	var futureLocation =  boid.position +  boid.velocity * 2;
+	var futureLocation = boid.position + velocity*3;
+#	var target = boid.position
+	# 如果下一个位置不在水中，改变desired
+	if !is_pos_in_water(futureLocation,boid):
+		# 计算对应灰度图的梯度图
+		img_gradlient =  calculateGradientField(img)
+		img_gradlient.save_png("image_gradlient.png")
+	# img_gradlient 梯度图
+		var img_gradlient_futureLocation = coordinates_space2pixel(futureLocation,img_gradlient,terrain_size)
+#		print("---------------img_gradlient_futureLocation-------------------",img_gradlient_futureLocation)
+		var img_gradlient_target_color  = img_gradlient.get_pixel(img_gradlient_futureLocation.x ,img_gradlient_futureLocation.y)
+#		target = Vector3(img_gradlient_target_color.r,0,img_gradlient_target_color.r)
+#		print("---------------img_gradlient_target_color-------------------",img_gradlient_target_color)
+		desired = Vector3(img_gradlient_target_color.r,0,img_gradlient_target_color.r)
+#		if desired = Vector3.ZERO:
+			
+		print("---------------desired-------------------",desired)
 	
-	print("futureLocation--------------------",futureLocation,"------boid.position-------",boid.position)
-	
-	# 下一个移动点不在水中，或者超出边界
-	if !is_pos_in_water(futureLocation) or !is_pos_in_border(futureLocation): #Go to the opposite direction
-		# 随机的方向，
-		var random_direction = random_direction()
-		print("-----------下一个移动点不在水中，或者超出边界-------------velocity---------------------------",velocity)
-		boid.applyVelocityChange(-velocity.normalized())
-
+#	desired = target - boid.position
+	desired.normalized()
+	desired *= topSpeed
+	var velocityChange = desired - velocity;
+	print("--------velocityChange---------",velocityChange)
+	if 	velocityChange.length() > maxVelocityChange: 
+		velocityChange = maxVelocityChange * velocityChange.normalized()
 		
-		
-# 生成一个随机的单位向量
-func random_direction():
-# PI 180度
-	var angle = randf_range(0, PI)  # 生成一个随机角度
-	var x = cos(angle)  # 计算 x 分量
-	var y = sin(angle)  # 计算 y 分量
-	return Vector3(x, 0.0, y)
+	return velocityChange
 	
-func random_velocity(delta):
-	var random_direction = random_direction()
-	#设置速度大小
-	var speed = 100
-# 生成随机方向向量并乘以速度大小
-	var random_velocity = random_direction() * speed
-# 使用随机速度进行移动
-	position += random_velocity * delta
-
 # 这个点是否在水中
-func is_pos_in_water(pos: Vector3):
-#	var location : Vector3 = boid.position
-	var pos_pixel = coordinates_space2pixel(pos,img,terrain_size) # 1280*720 / 8 *4.5
-	if pos_pixel.x >= 1280 or pos_pixel.x <=0 or pos_pixel.y >= 720 or pos_pixel.y <=0:
-		print("越界-------------------------------")
-		return false
-	else:
-		var pixel = img.get_pixel(pos_pixel.x ,pos_pixel.y)
-		print("pixel---------------",pixel)
-		# 0 是纯黑 1 白色
-		if pixel.r > 0.3 and pixel.r < 0.4:
-			print("不在水的区域----------------")
-			return false
-		else:
-			return true
+func is_pos_in_water(pos: Vector3,boid):
+	if (pos.x < 0):
+		pos.x = 0
+	if (pos.z < 0):
+		pos.z = 0
+	if (pos.x > 8):
+		pos.x = 8
+	if (pos.z > 4.5):
+		pos.z = 4.5
 		
-func is_pos_in_border(futureLocation: Vector3):
-	if (futureLocation.x < 0):
+	var pos_pixel = coordinates_space2pixel(pos,img,terrain_size) # 1280*720 / 8 *4.5
+	var pixel = img.get_pixel(pos_pixel.x ,pos_pixel.y)
+	print("---------------pixel------------------------",pixel)
+	# 0 是纯黑 1 白色
+	if pixel.r < 0.3 or pixel.r > 0.4:
+		boid.water = false
+		return true
+	else:
+		# 不是水的区域
+		boid.water = true
 		return false
-	if (futureLocation.z < 0):
-		return false
-	if (futureLocation.x > 8):
-		return false
-	if (futureLocation.z > 4.5):
-		return false
+		
 func coordinates_space2pixel(space_coord: Vector3,img,terrain_size)->Vector2:
 	# 图片的大小
 	var img_size = img.get_size()
@@ -425,7 +400,61 @@ func coordinates_space2pixel(space_coord: Vector3,img,terrain_size)->Vector2:
 	return Vector2(int(pixel_coord_x),int(pixel_coord_y))
 	
 	
+func calculateGradientField(texture: Image) -> Image:
+	# Get the image data from the texture
+	# PackedByteArray get_data() const 
+#	var image_data := texture.get_data()
+
+	# Get the size of the image
+	var width := texture.get_width()
+	var height := texture.get_height()
+	# img = img.create_from_data(frame.width, frame.height, false, Image.FORMAT_R8, frame.depth_array)
+	# Create a new image to store the gradient field
+#	var gradient_image := Image(width, height, false, Image.FORMAT_GRAYSCALE_ALPHA)
+	var gradient_image := Image.create(width, height, false, Image.FORMAT_LA8)
 	
+	# Loop through each pixel of the image
+	for x in range(width):
+		for y in range(height):
+			# Calculate the gradient for each pixel
+#			var gradient_x := calculateGradientX(x, y, image_data, width, height)
+			var gradient_x := calculateGradientX(x, y, texture, width, height)
+			var gradient_y := calculateGradientY(x, y, texture, width, height)
+
+			# Set the gradient value to the corresponding pixel in the gradient image
+			gradient_image.set_pixel(x, y, Color(gradient_x, gradient_y, 0, 1))
+
+	# Update the image data of the gradient texture
+#	gradient_image.lock()
+	var gradient_image_temp = gradient_image.duplicate()
+#	gradient_image.unlock()
+
+	# Create a new texture from the gradient image
+#	var gradient_texture := Image.new()
+#	gradient_texture.create_from_image(gradient_image)
+
+	# Return the gradient texture
+	
+	return gradient_image_temp
+
+func calculateGradientX(x: int, y: int, image_data: Image, width: int, height: int) -> float:
+	# Calculate the gradient in the x-direction
+	var left_index :int = max(x - 1, 0)
+	var right_index :int = min(x + 1, width - 1)
+
+	var left_height : = image_data.get_pixel(left_index, y).r
+	var right_height : = image_data.get_pixel(right_index, y).r
+
+	return right_height - left_height
+
+func calculateGradientY(x: int, y: int, image_data: Image, width: int, height: int) -> float:
+	# Calculate the gradient in the y-direction 
+	var top_index :int= max(y - 1, 0) 
+	var bottom_index :int = min(y + 1, height - 1) 
+	var top_height : = image_data.get_pixel(x, top_index).r 
+	var bottom_height  = image_data.get_pixel(x, bottom_index).r 
+	return bottom_height - top_height
+
 	
 	
 	

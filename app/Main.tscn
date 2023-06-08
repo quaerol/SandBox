@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://cdg7d04wdujgj"]
+[gd_scene load_steps=11 format=3 uid="uid://cdg7d04wdujgj"]
 
 [ext_resource type="Shader" path="res://ss.gdshader" id="1_0cl40"]
 [ext_resource type="Script" path="res://Terrain.gd" id="2_7l2sk"]
@@ -6,8 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://ji3x38udsvci" path="res://graymapforblender - 副本.png" id="3_nhwts"]
 [ext_resource type="Texture2D" uid="uid://c7rmpyrvvg280" path="res://1opensource1.png" id="4_6xgum"]
 [ext_resource type="Texture2D" uid="uid://bgq6b1sih5has" path="res://image.png" id="5_nqa18"]
-[ext_resource type="Script" path="res://test/Fishes_Boids_test.gd" id="7_nf3o4"]
-[ext_resource type="PackedScene" uid="uid://buut758lfwuk4" path="res://Animals/one_fish/single_fish.tscn" id="8_sa4un"]
+[ext_resource type="Script" path="res://Scenes/Fishes_Boids.gd" id="7_x1gaa"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_alafo"]
 render_priority = 0
@@ -39,13 +38,11 @@ script = ExtResource("2_7l2sk")
 
 [node name="Camera3D" type="Camera3D" parent="Avatar"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 4, 2.9, 2.25)
-fov = 107.1
+fov = 78.3
 
 [node name="Realsense" type="Realsense" parent="."]
 
 [node name="Node3D" type="Node3D" parent="."]
-script = ExtResource("7_nf3o4")
-water_depth = 0.7
-
-[node name="one_fish" parent="Node3D" instance=ExtResource("8_sa4un")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.1, 0.7)
+script = ExtResource("7_x1gaa")
+numBoids = 1
+water_depth = 0.5

@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://buut758lfwuk4"]
 
-[ext_resource type="Script" path="res://test/fish.gd" id="1_rtval"]
+[ext_resource type="Script" path="res://Scenes/fish2.gd" id="1_s0pe1"]
 [ext_resource type="ArrayMesh" uid="uid://c6sylt7ph5lge" path="res://Animals/one_fish/fish_mesh.obj" id="2_gp71v"]
 [ext_resource type="Texture2D" uid="uid://xa62c7ux4qfu" path="res://Animals/one_fish/fish_mesh.jpg" id="3_2k70e"]
 [ext_resource type="Script" path="res://Animals/one_fish/fish_mesh.gd" id="4_qfmm6"]
@@ -92,9 +92,9 @@ void vertex() {
 	new_pos.xy = mix(new_pos.xy, matrix_twist * new_pos.xy, mask);
 	new_pos.z += mod(tmult_0, swim_max) * swim_factor;
 	
-	
-	VERTEX = new_pos;
-	
+// 顶点变形
+//	VERTEX = new_pos;
+
 	// UV
 	UV=UV*uv1_scale.xy+uv1_offset.xy;
 	
@@ -168,12 +168,13 @@ shader_parameter/body_length = 2.0
 shader_parameter/mask_black = -1.0
 shader_parameter/mask_white = 1.0
 shader_parameter/frequency = 2.0
-shader_parameter/fish_timer = 996.611
+shader_parameter/fish_timer = 4.50175
 shader_parameter/texture_albedo = ExtResource("3_2k70e")
 
 [node name="one_fish" type="Node3D"]
-script = ExtResource("1_rtval")
-velocity = Vector3(0, 0, 0)
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
+script = ExtResource("1_s0pe1")
+d = 0.2
 
 [node name="fish_mesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(-0.2, 0, -3.01992e-08, 0, 0.2, 0, 3.01992e-08, 0, -0.2, 0, 0, 0)
